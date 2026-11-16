@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tarjetas didácticas – Primeros Auxilios Psicológicos (A-B-C-D-E)</title>
+<style>
+  :root { --txt:#2f3a45; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"Segoe UI",system-ui,sans-serif; background:#f7f5f1; color:var(--txt); }
+  header { text-align:center; padding:24px 16px 8px; }
+  h1 { margin:0 0 6px; font-size:1.5rem; }
+  header p { margin:0; color:#5d6975; font-size:.95rem; }
+  .bar { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:14px 16px; }
+  .bar button { border:1px solid #cfd6dc; background:#fff; border-radius:999px; padding:7px 14px; cursor:pointer; font-size:.9rem; color:var(--txt); }
+  .bar button.on { background:#2f3a45; color:#fff; border-color:#2f3a45; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:18px; padding:8px 20px 40px; max-width:1200px; margin:0 auto; }
+  .card { perspective:1000px; height:270px; cursor:pointer; }
+  .inner { position:relative; width:100%; height:100%; transition:transform .55s; transform-style:preserve-3d; }
+  .card.flip .inner { transform:rotateY(180deg); }
+  .face { position:absolute; inset:0; backface-visibility:hidden; border-radius:16px; padding:18px 18px 14px; display:flex; flex-direction:column; box-shadow:0 2px 8px rgba(0,0,0,.08); overflow:auto; }
+  .back { transform:rotateY(180deg); }
+  .tag { font-size:.75rem; letter-spacing:.04em; text-transform:uppercase; color:#55606b; display:flex; justify-content:space-between; margin-bottom:10px; }
+  .body { flex:1; display:flex; align-items:center; font-size:1.02rem; line-height:1.45; }
+  .txt { width:100%; }
+  .front .body { justify-content:center; text-align:center; font-weight:600; font-size:1.08rem; }
+  .hint { font-size:.72rem; color:#6b7782; text-align:center; margin-top:8px; }
+  .c-hueso{background:#f1ece2} .c-menta{background:#d8f0e3} .c-cielo{background:#d6e8f7}
+  .c-amarillo{background:#fbf3c9} .c-lila{background:#e6dcf4} .c-rosa{background:#f8dde4}
+  .actions { text-align:center; padding-bottom:10px; }
+  .actions button { border:1px solid #cfd6dc; background:#fff; border-radius:8px; padding:7px 14px; cursor:pointer; margin:0 4px; color:var(--txt); }
+  @media print {
+    body { background:#fff; } header p, .bar, .actions, .hint { display:none; }
+    .grid { display:block; padding:0; }
+    .card { height:auto; perspective:none; page-break-inside:avoid; margin-bottom:10px; }
+    .inner { transform:none !important; display:grid; grid-template-columns:1fr 1fr; gap:6px; transform-style:flat; }
+    .face { position:static; transform:none !important; backface-visibility:visible; box-shadow:none; border:1px solid #bbb; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Primeros Auxilios Psicológicos · Protocolo A-B-C-D-E</h1>
+  <p>Toca una tarjeta para voltearla. Usa los filtros para estudiar un paso a la vez.</p>
+</header>
+<div class="bar" id="bar"></div>
+<div class="actions">
+  <button id="shuffle">Mezclar</button>
+  <button id="reset">Orden original</button>
+  <button id="flipall">Voltear todas</button>
+  <button onclick="window.print()">Imprimir</button>
+</div>
+<div class="grid" id="grid"></div>
+
+<script>
+const CARDS = [
+ {n:1, paso:"General", c:"hueso", q:"¿Qué es el protocolo A, B, C, D, E y qué significa cada letra?", a:"Es el protocolo de primeros auxilios psicológicos.<br><b>A</b>: escucha activa · <b>B</b>: reentrenamiento de la ventilación · <b>C</b>: categorización de necesidades · <b>D</b>: derivación a redes de apoyo · <b>E</b>: psicoeducación."},
+ {n:2, paso:"A", c:"menta", q:"Paso A: ¿qué es la escucha activa y qué busca transmitir?", a:"Son técnicas <b>gestuales y verbales</b> que transmiten a la persona que alguien está interesado en lo que dice. Es una escucha respetuosa, tanto desde el silencio como desde la palabra de la persona."},
+ {n:3, paso:"A", c:"menta", q:"Paso A: ¿qué actitudes debes evitar al escuchar a alguien en crisis?", a:"Evita la <b>impaciencia</b> y el <b>enganche con la agresión</b> de lo que la persona está diciendo."},
+ {n:4, paso:"A", c:"menta", q:"Paso A: ¿cómo demuestras que estás comprendiendo a la persona?", a:"Prestas atención a cada una de sus palabras, comprendes lo que dice y <b>preguntas</b> por lo que está manifestando. Así la ayudas en su discurso."},
+ {n:5, paso:"B", c:"cielo", q:"Paso B: ¿qué es el reentrenamiento de la ventilación y por qué funciona?", a:"Es un ejercicio de respiración para relajarse, recuperar la calma y mantenerla en el tiempo. Funciona porque <b>la manera de respirar influye en el estado emocional</b> (por eso el yoga y la meditación regulan las emociones)."},
+ {n:6, paso:"B", c:"cielo", q:"Paso B: ¿para quién es ideal este ejercicio?", a:"Para personas <b>demasiado desbordadas</b>, a quienes les cuesta organizar las ideas y priorizar qué necesitan gestionar o resolver."},
+ {n:7, paso:"B", c:"cielo", q:"Paso B: ¿cuáles son los pasos del ejercicio de respiración?", a:"1) <b>Inspirar</b> en 4 tiempos.<br>2) <b>Exhalar</b> en 4 tiempos.<br>3) <b>Aguantar con los pulmones vacíos</b> 4 tiempos.<br>Repetir el ciclo durante <b>10 minutos</b>."},
+ {n:8, paso:"B", c:"cielo", q:"Paso B: ¿cuándo se recomienda practicar el ejercicio?", a:"Al despertar, después del almuerzo, antes de acostarse, y cada vez que la persona se sienta muy angustiada."},
+ {n:9, paso:"B", c:"cielo", q:"Paso B: ¿cómo se lo ofreces a la persona en la práctica?", a:"1) Ofrecérselo, si lo permite.<br>2) Explicarle la dinámica para bajar la angustia.<br>3) Mostrarle con un ejemplo cómo hacerlo.<br>4) Aconsejarle que, mientras bota el aire, piense en la palabra <b>«calma»</b>."},
+ {n:10, paso:"C", c:"amarillo", q:"Paso C: ¿qué es la categorización de necesidades y cuándo se usa?", a:"Ayuda a la persona a identificar y ordenar sus prioridades, es decir, lo que necesita solución sí o sí. Se usa cuando está <b>demasiado abrumada</b> para organizar sus ideas."},
+ {n:11, paso:"C", c:"amarillo", q:"Paso C: ¿qué categorías de necesidades puedes sugerirle?", a:"Temas <b>familiares</b> · <b>información</b> de la situación · <b>atención médica</b> · <b>protección policial</b> disponible · <b>refugio</b> · <b>alimentos y medicina</b>."},
+ {n:12, paso:"C", c:"amarillo", q:"Paso C: ¿cómo guías a la persona para ordenar sus prioridades?", a:"Vas de la mano con ella y la encaminas. Cuando toma la palabra, le preguntas <b>qué es lo más urgente</b> que necesita resolver. Luego das sugerencias según sus prioridades."},
+ {n:13, paso:"D", c:"lila", q:"Paso D: ¿en qué consiste la derivación a redes de apoyo?", a:"Con las necesidades identificadas, priorizadas y con un <b>plan de acción</b>, se llevan a cabo las respuestas para afrontar la emergencia. Se da a conocer a la persona las <b>redes de servicio disponibles</b>."},
+ {n:14, paso:"D", c:"lila", q:"Paso D: ¿qué material debes entregar y para qué sirve?", a:"Un <b>material físico de apoyo y guía</b> que explique los dispositivos de ayuda disponibles frente a la crisis. Así la persona sabe a qué red acudir."},
+ {n:15, paso:"E", c:"rosa", q:"Paso E: ¿qué es la psicoeducación y qué se explica en ella?", a:"Es una orientación sobre las <b>reacciones emocionales y cognitivas</b> de los días posteriores a la crisis. Se explica que es un proceso <b>normal</b> y cuál es su etapa final. También se <b>desmienten mitos</b>."},
+ {n:16, paso:"E", c:"rosa", q:"Paso E: ¿qué le entregas a la persona al cerrar la intervención?", a:"Técnicas de <b>afrontamiento</b> para manejar sus emociones a futuro, material de apoyo y respuestas a sus dudas. Un <b>número de contacto</b> para consultar si no logra gestionar sus emociones, y dónde ubicar a quien le brindó el apoyo."}
+];
+const COLORNAME={hueso:"Blanco hueso",menta:"Verde menta",cielo:"Azul cielo",amarillo:"Amarillo tenue",lila:"Lila",rosa:"Rosa pálido"};
+let order=[...CARDS], filter="Todos";
+const grid=document.getElementById("grid"), bar=document.getElementById("bar");
+function render(){
+  grid.innerHTML="";
+  order.filter(c=>filter==="Todos"||c.paso===filter).forEach(c=>{
+    const d=document.createElement("div"); d.className="card";
+    d.innerHTML=`<div class="inner">
+      <div class="face front c-${c.c}"><div class="tag"><span>Tarjeta ${c.n}</span><span>Paso ${c.paso}</span></div><div class="body"><div class="txt">${c.q}</div></div><div class="hint">Toca para ver la respuesta</div></div>
+      <div class="face back c-${c.c}"><div class="tag"><span>Tarjeta ${c.n}</span><span>${COLORNAME[c.c]}</span></div><div class="body"><div class="txt">${c.a}</div></div></div>
+    </div>`;
+    d.onclick=()=>d.classList.toggle("flip"); grid.appendChild(d);
+  });
+}
+["Todos","General","A","B","C","D","E"].forEach(f=>{
+  const b=document.createElement("button"); b.textContent=f==="Todos"||f==="General"?f:"Paso "+f;
+  b.onclick=()=>{filter=f;[...bar.children].forEach(x=>x.classList.remove("on"));b.classList.add("on");render();};
+  if(f==="Todos")b.classList.add("on"); bar.appendChild(b);
+});
+document.getElementById("shuffle").onclick=()=>{order=[...CARDS].sort(()=>Math.random()-.5);render();};
+document.getElementById("reset").onclick=()=>{order=[...CARDS];render();};
+document.getElementById("flipall").onclick=()=>{const cs=[...document.querySelectorAll(".card")];const all=cs.every(c=>c.classList.contains("flip"));cs.forEach(c=>c.classList.toggle("flip",!all));};
+render();
+</script>
+</body>
+</html>
